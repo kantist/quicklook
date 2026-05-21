@@ -1,0 +1,42 @@
+{
+  "name": "@dvina/quicklook",
+  "version": "0.1.0",
+  "description": "Server-first, cross-platform preview and thumbnail generation for files.",
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "check": "tsc -p tsconfig.json --noEmit",
+    "example": "tsx example/run.ts",
+    "test": "tsx --test test/**/*.test.ts"
+  },
+  "dependencies": {
+    "execa": "^9.6.0",
+    "file-type": "^20.5.0",
+    "fflate": "^0.8.2",
+    "mime-types": "^3.0.1",
+    "sharp": "^0.34.2",
+    "which": "^5.0.0"
+  },
+  "devDependencies": {
+    "@types/mime-types": "^3.0.1",
+    "@types/node": "^24.0.0",
+    "@types/which": "^3.0.4",
+    "tsx": "^4.20.5",
+    "typescript": "^5.8.3"
+  }
+}

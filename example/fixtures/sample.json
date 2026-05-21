@@ -1,0 +1,12 @@
+{
+  "name": "@dvina/quicklook",
+  "runtime": "node24",
+  "inputModes": ["path", "buffer", "stream"],
+  "defaultSize": {
+    "maxEdge": 512
+  },
+  "notes": [
+    "This is a manual example fixture.",
+    "Text-like formats render with the text strategy."
+  ]
+}

@@ -1,0 +1,80 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  versioning:
+    name: Get Versioning
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      version: ${{ steps.versioning.outputs.version }}
+      tag: v${{ steps.versioning.outputs.version }}
+    steps:
+      - name: Get Semver
+        id: versioning
+        uses: MCKanpolat/auto-semver-action@v1
+        with:
+          releaseType: patch
+          incrementPerCommit: false
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
+  publish:
+    name: Verify and Publish Package
+    needs: [versioning]
+    permissions:
+      contents: read
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      RELEASE_VERSION: ${{ needs.versioning.outputs.version }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          registry-url: "https://registry.npmjs.org"
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Set package version
+        run: npm version "$RELEASE_VERSION" --no-git-tag-version
+
+      - name: Run tests
+        run: npm test
+
+      - name: Build package
+        run: npm run build
+
+      - name: Publish package
+        run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  release:
+    name: Create Release
+    needs: [versioning, publish]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ needs.versioning.outputs.tag }}
+          name: ${{ needs.versioning.outputs.version }}
+          target_commitish: ${{ github.sha }}
