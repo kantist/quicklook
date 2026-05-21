@@ -70,7 +70,6 @@ const result = await quicklook.generate(
     path: "/tmp/report.pdf",
   },
   {
-    kind: "preview",
     size: { maxEdge: 512 },
     format: "webp",
   },
@@ -124,7 +123,6 @@ size: { width: 1200, height: 800, fit: "contain" }
 
 Defaults:
 
-- `kind: "thumbnail"`
 - `format: "webp"`
 - `size: { maxEdge: 512 }`
 - `noUpscale: true`
@@ -151,7 +149,6 @@ const result = await quicklook.generate(
     mimeType: "text/markdown",
   },
   {
-    kind: "preview",
     size: { maxEdge: 512 },
   },
 );
@@ -263,7 +260,6 @@ Request shape:
 
 ```ts
 type QuicklookRequest = {
-  kind?: "thumbnail" | "preview";
   size?:
     | { maxEdge: number }
     | { width: number; height: number; fit?: "contain" | "cover" };

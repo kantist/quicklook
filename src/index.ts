@@ -18,7 +18,6 @@ export type {
   QuicklookFit,
   QuicklookInput,
   QuicklookInstance,
-  QuicklookKind,
   QuicklookLimits,
   QuicklookMetadata,
   QuicklookOptions,

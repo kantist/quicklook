@@ -20,7 +20,6 @@ test("generates a text preview using maxEdge sizing", async () => {
       mimeType: "text/markdown",
     },
     {
-      kind: "preview",
       size: { maxEdge: 256 },
     },
   );

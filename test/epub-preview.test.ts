@@ -57,7 +57,6 @@ test("extracts an EPUB cover image and renders it as a preview", async () => {
       mimeType: "application/epub+zip",
     },
     {
-      kind: "preview",
       size: { maxEdge: 256 },
     },
   );

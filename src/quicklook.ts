@@ -45,7 +45,6 @@ export function createQuicklook(options: QuicklookOptions = {}): QuicklookInstan
         const resolvedInput = await prepareResolvedInput(input, session.path, normalizedOptions.limits.maxInputBytes);
         const strategy = await selectStrategy(
           resolvedInput,
-          normalizedRequest.kind,
           runtime,
           normalizedOptions.strategies,
         );

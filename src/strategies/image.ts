@@ -1,6 +1,4 @@
-import type { QuicklookKind, QuicklookStrategy } from "../types.js";
-
-const KINDS: QuicklookKind[] = ["thumbnail", "preview"];
+import type { QuicklookStrategy } from "../types.js";
 
 export function createImageStrategy(): QuicklookStrategy {
   return {
@@ -8,9 +6,6 @@ export function createImageStrategy(): QuicklookStrategy {
     priority: 100,
     match(input) {
       return input.sourceKind === "image" ? 100 : null;
-    },
-    capabilities() {
-      return KINDS;
     },
     async render(context) {
       return {

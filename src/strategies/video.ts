@@ -3,9 +3,7 @@ import { join } from "node:path";
 import { QuicklookDependencyError } from "../errors.js";
 import { runCommand } from "../utils/exec.js";
 
-import type { QuicklookKind, QuicklookStrategy } from "../types.js";
-
-const KINDS: QuicklookKind[] = ["thumbnail", "preview"];
+import type { QuicklookStrategy } from "../types.js";
 
 export function createVideoStrategy(): QuicklookStrategy {
   return {
@@ -17,9 +15,6 @@ export function createVideoStrategy(): QuicklookStrategy {
       }
 
       return runtime.ffmpeg.available ? 90 : null;
-    },
-    capabilities() {
-      return KINDS;
     },
     async render(context) {
       const binaryPath = context.runtime.ffmpeg.path;

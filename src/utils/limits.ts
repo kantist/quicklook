@@ -22,14 +22,12 @@ export function normalizeLimits(limits?: QuicklookLimits): NormalizedQuicklookLi
 }
 
 export function normalizeRequest(request: QuicklookRequest = {}): NormalizedQuicklookRequest {
-  const kind = request.kind ?? "thumbnail";
   const format = request.format ?? "webp";
   const page = normalizePositiveInteger(request.page ?? 1, "request.page");
   const noUpscale = request.noUpscale ?? true;
 
   if (request.size && "maxEdge" in request.size) {
     return {
-      kind,
       format,
       page,
       noUpscale,
@@ -42,7 +40,6 @@ export function normalizeRequest(request: QuicklookRequest = {}): NormalizedQuic
 
   if (request.size && "width" in request.size && "height" in request.size) {
     return {
-      kind,
       format,
       page,
       noUpscale,
@@ -56,7 +53,6 @@ export function normalizeRequest(request: QuicklookRequest = {}): NormalizedQuic
   }
 
   return {
-    kind,
     format,
     page,
     noUpscale,

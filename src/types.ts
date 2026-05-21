@@ -1,5 +1,3 @@
-export type QuicklookKind = "thumbnail" | "preview";
-
 export type QuicklookOutputFormat = "webp" | "png";
 
 export type QuicklookSourceKind = "image" | "video" | "pdf" | "office" | "text" | "epub" | "unknown";
@@ -36,7 +34,6 @@ export type QuicklookInput = QuicklookPathInput | QuicklookBufferInput | Quicklo
 export type QuicklookSizeRequest = { maxEdge: number } | { width: number; height: number; fit?: QuicklookFit };
 
 export interface QuicklookRequest {
-  kind?: QuicklookKind;
   size?: QuicklookSizeRequest;
   format?: QuicklookOutputFormat;
   page?: number;
@@ -65,7 +62,6 @@ export interface ProbeResult {
   strategyId?: string;
   mimeType?: string;
   extension?: string;
-  kinds?: QuicklookKind[];
   reason?: ProbeFailureReason;
   details?: string;
 }
@@ -107,7 +103,6 @@ export type NormalizedQuicklookSizeRequest =
   | { mode: "box"; width: number; height: number; fit: QuicklookFit };
 
 export interface NormalizedQuicklookRequest {
-  kind: QuicklookKind;
   size: NormalizedQuicklookSizeRequest;
   format: QuicklookOutputFormat;
   page: number;
@@ -157,7 +152,6 @@ export interface QuicklookStrategy {
   id: string;
   priority: number;
   match(input: ProbeInput | ResolvedInput, runtime: RuntimeCapabilities): Promise<number | null> | number | null;
-  capabilities(input: ProbeInput | ResolvedInput, runtime: RuntimeCapabilities): Promise<QuicklookKind[]> | QuicklookKind[];
   render(context: StrategyRenderContext): Promise<StrategyRenderResult>;
 }
 

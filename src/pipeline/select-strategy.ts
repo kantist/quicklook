@@ -1,9 +1,8 @@
-import type { ProbeInput, QuicklookKind, QuicklookStrategy, ResolvedInput, RuntimeCapabilities } from "../types.js";
+import type { ProbeInput, QuicklookStrategy, ResolvedInput, RuntimeCapabilities } from "../types.js";
 
 export interface RankedStrategy {
   strategy: QuicklookStrategy;
   score: number;
-  capabilities: QuicklookKind[];
 }
 
 export async function rankStrategies(
@@ -19,12 +18,9 @@ export async function rankStrategies(
         return undefined;
       }
 
-      const capabilities = await strategy.capabilities(input, runtime);
-
       return {
         strategy,
         score,
-        capabilities,
       } satisfies RankedStrategy;
     }),
   );
@@ -36,10 +32,9 @@ export async function rankStrategies(
 
 export async function selectStrategy(
   input: ResolvedInput,
-  kind: QuicklookKind,
   runtime: RuntimeCapabilities,
   strategies: QuicklookStrategy[],
 ): Promise<QuicklookStrategy | undefined> {
   const ranked = await rankStrategies(input, runtime, strategies);
-  return ranked.find((entry) => entry.capabilities.includes(kind))?.strategy;
+  return ranked[0]?.strategy;
 }

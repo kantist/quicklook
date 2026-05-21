@@ -1,8 +1,6 @@
 import { renderTextPreview } from "../renderers/text-preview.js";
 
-import type { QuicklookKind, QuicklookStrategy } from "../types.js";
-
-const KINDS: QuicklookKind[] = ["thumbnail", "preview"];
+import type { QuicklookStrategy } from "../types.js";
 
 export function createTextStrategy(): QuicklookStrategy {
   return {
@@ -10,9 +8,6 @@ export function createTextStrategy(): QuicklookStrategy {
     priority: 60,
     match(input) {
       return input.sourceKind === "text" ? 60 : null;
-    },
-    capabilities() {
-      return KINDS;
     },
     async render(context) {
       return {

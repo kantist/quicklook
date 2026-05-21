@@ -32,7 +32,6 @@ export async function probeInput(args: {
         strategyId: ranked[0].strategy.id,
         mimeType: inspectedInput.mimeType,
         extension: inspectedInput.extension,
-        kinds: ranked[0].capabilities,
       };
     }
 

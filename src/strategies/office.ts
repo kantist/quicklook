@@ -8,9 +8,7 @@ import { runCommand } from "../utils/exec.js";
 
 import { renderPdfToPng } from "./pdf.js";
 
-import type { QuicklookKind, QuicklookStrategy } from "../types.js";
-
-const KINDS: QuicklookKind[] = ["thumbnail", "preview"];
+import type { QuicklookStrategy } from "../types.js";
 
 export function createOfficeStrategy(): QuicklookStrategy {
   return {
@@ -22,9 +20,6 @@ export function createOfficeStrategy(): QuicklookStrategy {
       }
 
       return hasOfficeRenderingSupport(runtime) ? 70 : null;
-    },
-    capabilities() {
-      return KINDS;
     },
     async render(context) {
       const binaryPath = context.runtime.libreoffice.path;

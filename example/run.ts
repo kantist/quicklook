@@ -19,7 +19,6 @@ interface CliOptions {
   inputPath: string;
   outputPath: string;
   mode: CliMode;
-  kind: "thumbnail" | "preview";
   format: "webp" | "png";
   maxEdge?: number;
   width?: number;
@@ -75,7 +74,6 @@ function parseArgs(args: string[]): CliOptions {
     inputPath: resolveFromRoot("example/fixtures/sample.md"),
     outputPath: resolveFromRoot("example/output/sample.webp"),
     mode: "stream",
-    kind: "preview",
     format: "webp",
     maxEdge: 512,
     noUpscale: true,
@@ -97,16 +95,6 @@ function parseArgs(args: string[]): CliOptions {
       case "--mode":
         values.mode = parseMode(readRequiredValue(args[++index], "--mode"));
         break;
-      case "--kind": {
-        const kind = readRequiredValue(args[++index], "--kind");
-
-        if (kind !== "thumbnail" && kind !== "preview") {
-          throw new QuicklookInputError("--kind must be thumbnail or preview.");
-        }
-
-        values.kind = kind;
-        break;
-      }
       case "--format": {
         const format = readRequiredValue(args[++index], "--format");
 
@@ -197,7 +185,6 @@ async function buildInput(options: CliOptions): Promise<QuicklookInput> {
 
 function buildRequest(options: CliOptions): QuicklookRequest {
   return {
-    kind: options.kind,
     format: options.format,
     noUpscale: options.noUpscale,
     page: options.page,
@@ -230,7 +217,6 @@ Options:
   --input <path>       Input file path
   --out <path>         Output file path
   --mode <mode>        path | buffer | stream (default: stream)
-  --kind <kind>        thumbnail | preview (default: preview)
   --format <format>    webp | png (default: webp)
   --max-edge <px>      Resize so the longest edge matches this value (default: 512)
   --width <px>         Fixed output width

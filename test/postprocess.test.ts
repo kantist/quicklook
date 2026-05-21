@@ -36,7 +36,6 @@ test("trims white margins before resizing when requested", async () => {
   const untrimmed = await postprocessRenderedOutput(
     source,
     {
-      kind: "preview",
       format: "webp",
       noUpscale: true,
       page: 1,
@@ -48,7 +47,6 @@ test("trims white margins before resizing when requested", async () => {
   const trimmed = await postprocessRenderedOutput(
     source,
     {
-      kind: "preview",
       format: "webp",
       noUpscale: true,
       page: 1,

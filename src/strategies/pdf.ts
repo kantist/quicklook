@@ -6,9 +6,7 @@ import { QuicklookDependencyError, QuicklookRenderError } from "../errors.js";
 import { hasPdfRenderingSupport } from "../runtime/capabilities.js";
 import { runCommand } from "../utils/exec.js";
 
-import type { QuicklookKind, QuicklookStrategy, RuntimeCapabilities } from "../types.js";
-
-const KINDS: QuicklookKind[] = ["thumbnail", "preview"];
+import type { QuicklookStrategy, RuntimeCapabilities } from "../types.js";
 
 export function createPdfStrategy(): QuicklookStrategy {
   return {
@@ -20,9 +18,6 @@ export function createPdfStrategy(): QuicklookStrategy {
       }
 
       return hasPdfRenderingSupport(runtime) ? 80 : null;
-    },
-    capabilities() {
-      return KINDS;
     },
     async render(context) {
       const outputPath = await renderPdfToPng({
