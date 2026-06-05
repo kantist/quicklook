@@ -9,7 +9,7 @@ export async function postprocessRenderedOutput(
   request: NormalizedQuicklookRequest,
   options: { trimWhitespace?: boolean } = {},
 ): Promise<{ buffer: Buffer; mimeType: "image/webp" | "image/png"; width: number; height: number }> {
-  const transform = sharp(source, { density: 144 });
+  const transform = sharp(source, { density: 144 }).autoOrient();
   const marginPx = options.trimWhitespace ? TRIMMED_OUTPUT_MARGIN_PX : 0;
 
   if (options.trimWhitespace) {
