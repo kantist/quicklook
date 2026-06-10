@@ -6,7 +6,7 @@ import { QuicklookDependencyError, QuicklookRenderError } from "../errors.js";
 
 import type { NormalizedQuicklookLimits, NormalizedQuicklookRequest, ResolvedInput, RuntimeCapabilities } from "../types.js";
 
-const DEFAULT_VIEWPORT = { width: 1365, height: 1024 } as const;
+const DEFAULT_VIEWPORT = { width: 1200, height: 1600 } as const;
 const MAX_CAPTURE_HEIGHT = 2400;
 const MIN_VIEWPORT_WIDTH = 900;
 const MAX_VIEWPORT_WIDTH = 1600;

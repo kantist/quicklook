@@ -239,6 +239,7 @@ HTML previews are rendered in a real headless browser and then resized through t
 - Uses an external Chromium or Chrome binary; no bundled browser download
 - Loads the local file with `file://` so path inputs can keep relative CSS, JS, and image references
 - `buffer` and `stream` inputs work best when the HTML is self-contained or points at remote assets
+- Uses a portrait-leaning default viewport so document-style pages preview more naturally
 - Captures the top of the page instead of reducing extremely tall pages into unreadable full-page miniatures
 
 ### EPUB

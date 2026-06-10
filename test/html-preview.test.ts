@@ -92,6 +92,7 @@ test("renders html previews through chromium when available", async (context) =>
   assert.equal(result.mimeType, "image/webp");
   assert.ok(result.width <= 256);
   assert.ok(result.height <= 256);
+  assert.ok(result.height >= result.width);
 
   const stats = await sharp(result.buffer).stats();
   assert.ok(stats.channels[0].mean > stats.channels[2].mean);
