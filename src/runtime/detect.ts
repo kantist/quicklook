@@ -11,6 +11,18 @@ const BINARY_CANDIDATES = {
   pdftocairo: ["pdftocairo"],
   pdftoppm: ["pdftoppm"],
   libreoffice: ["/Applications/LibreOffice.app/Contents/MacOS/soffice", "libreoffice", "soffice"],
+  chromium: [
+    "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+    "/Applications/Arc.app/Contents/MacOS/Arc",
+    "/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge",
+    "/Applications/Chromium.app/Contents/MacOS/Chromium",
+    "google-chrome-stable",
+    "google-chrome",
+    "microsoft-edge",
+    "msedge",
+    "chromium",
+    "chromium-browser",
+  ],
 } as const;
 
 const VERSION_ARGS = {
@@ -18,14 +30,16 @@ const VERSION_ARGS = {
   pdftocairo: ["-v"],
   pdftoppm: ["-v"],
   libreoffice: ["--version"],
+  chromium: ["--version"],
 } as const;
 
 export async function detectRuntimeCapabilities(binaries: QuicklookBinaryOptions = {}): Promise<RuntimeCapabilities> {
-  const [ffmpeg, pdftocairo, pdftoppm, libreoffice] = await Promise.all([
+  const [ffmpeg, pdftocairo, pdftoppm, libreoffice, chromium] = await Promise.all([
     detectBinary("ffmpeg", binaries.ffmpeg, BINARY_CANDIDATES.ffmpeg, VERSION_ARGS.ffmpeg),
     detectBinary("pdftocairo", binaries.pdftocairo, BINARY_CANDIDATES.pdftocairo, VERSION_ARGS.pdftocairo),
     detectBinary("pdftoppm", binaries.pdftoppm, BINARY_CANDIDATES.pdftoppm, VERSION_ARGS.pdftoppm),
     detectBinary("libreoffice", binaries.libreoffice, BINARY_CANDIDATES.libreoffice, VERSION_ARGS.libreoffice),
+    detectBinary("chromium", binaries.chromium, BINARY_CANDIDATES.chromium, VERSION_ARGS.chromium),
   ]);
 
   return {
@@ -33,6 +47,7 @@ export async function detectRuntimeCapabilities(binaries: QuicklookBinaryOptions
     pdftocairo,
     pdftoppm,
     libreoffice,
+    chromium,
   };
 }
 
@@ -50,7 +65,11 @@ async function detectBinary(
     };
   }
 
-  const path = configuredValue ? await which(configuredValue, { nothrow: true }) : await findFirstAvailableBinary(candidates);
+  const path = configuredValue
+    ? configuredValue.includes("/")
+      ? await resolveAbsoluteBinary(configuredValue)
+      : await which(configuredValue, { nothrow: true })
+    : await findFirstAvailableBinary(candidates);
 
   if (!path) {
     return {
@@ -60,6 +79,13 @@ async function detectBinary(
   }
 
   const version = await readBinaryVersion(path, versionArgs);
+
+  if (version === null) {
+    return {
+      name,
+      available: false,
+    };
+  }
 
   return {
     name,
@@ -92,12 +118,16 @@ async function resolveAbsoluteBinary(path: string): Promise<string | undefined> 
   }
 }
 
-async function readBinaryVersion(path: string, args: readonly string[]): Promise<string | undefined> {
+async function readBinaryVersion(path: string, args: readonly string[]): Promise<string | undefined | null> {
   const result = await execa(path, [...args], {
     reject: false,
     timeout: 5_000,
     windowsHide: true,
   });
+
+  if (result.failed || result.exitCode !== 0 || result.timedOut) {
+    return null;
+  }
 
   const output = `${result.stdout}\n${result.stderr}`.trim();
   const firstLine = output.split(/\r?\n/u).find(Boolean);

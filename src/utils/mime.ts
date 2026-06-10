@@ -11,8 +11,6 @@ const TEXT_EXTENSIONS = new Set([
   "markdown",
   "json",
   "xml",
-  "html",
-  "htm",
   "js",
   "jsx",
   "ts",
@@ -49,6 +47,9 @@ const TEXT_MIME_TYPES = new Set([
   "application/x-yaml",
 ]);
 
+const HTML_EXTENSIONS = new Set(["html", "htm", "xhtml"]);
+const HTML_MIME_TYPES = new Set(["text/html", "application/xhtml+xml"]);
+
 export function normalizeExtension(value?: string | null): string | undefined {
   if (!value) {
     return undefined;
@@ -74,6 +75,10 @@ export function extensionFromMime(mimeType?: string): string | undefined {
 export function detectSourceKind(args: { extension?: string; mimeType?: string }): QuicklookSourceKind {
   const extension = normalizeExtension(args.extension);
   const mimeType = args.mimeType?.toLowerCase();
+
+  if (HTML_EXTENSIONS.has(extension ?? "") || HTML_MIME_TYPES.has(mimeType ?? "")) {
+    return "html";
+  }
 
   if (mimeType === "application/epub+zip" || extension === "epub") {
     return "epub";

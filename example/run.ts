@@ -283,6 +283,8 @@ function inferMimeTypeFromFilename(filename: string): string | undefined {
       return "application/json";
     case ".html":
       return "text/html";
+    case ".xhtml":
+      return "application/xhtml+xml";
     case ".xml":
       return "application/xml";
     case ".csv":

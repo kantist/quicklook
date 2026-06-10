@@ -1,6 +1,6 @@
 export type QuicklookOutputFormat = "webp" | "png";
 
-export type QuicklookSourceKind = "image" | "video" | "pdf" | "office" | "text" | "epub" | "unknown";
+export type QuicklookSourceKind = "image" | "video" | "pdf" | "office" | "html" | "text" | "epub" | "unknown";
 
 export type QuicklookFit = "contain" | "cover";
 
@@ -79,6 +79,7 @@ export interface RuntimeCapabilities {
   pdftocairo: RuntimeBinaryCapability;
   pdftoppm: RuntimeBinaryCapability;
   libreoffice: RuntimeBinaryCapability;
+  chromium: RuntimeBinaryCapability;
 }
 
 export interface QuicklookBinaryOptions {
@@ -86,6 +87,7 @@ export interface QuicklookBinaryOptions {
   pdftocairo?: string | false;
   pdftoppm?: string | false;
   libreoffice?: string | false;
+  chromium?: string | false;
 }
 
 export interface QuicklookLimits {

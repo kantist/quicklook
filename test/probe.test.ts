@@ -63,6 +63,28 @@ test("reports missing dependencies for csv inputs when libreoffice is unavailabl
   assert.equal(result.sourceKind, "office");
 });
 
+test("reports missing dependencies for html inputs when chromium is unavailable", async () => {
+  const quicklook = createQuicklook({
+    binaries: {
+      ffmpeg: false,
+      pdftocairo: false,
+      pdftoppm: false,
+      libreoffice: false,
+      chromium: false,
+    },
+  });
+
+  const result = await quicklook.probe({
+    buffer: Buffer.from("<!doctype html><html><body><h1>Hello</h1></body></html>"),
+    filename: "preview.html",
+    mimeType: "text/html",
+  });
+
+  assert.equal(result.supported, false);
+  assert.equal(result.reason, "missing_dependency");
+  assert.equal(result.sourceKind, "html");
+});
+
 test("reports epub inputs as supported when a cover image can be extracted", async () => {
   const quicklook = createQuicklook({
     binaries: {

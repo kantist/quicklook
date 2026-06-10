@@ -29,6 +29,7 @@ Current strategies:
 - `pdf` - first-page render via `pdftocairo` or `pdftoppm`
 - `office` - `libreoffice -> pdf -> image`
 - `epub` - cover-image extraction from the EPUB archive
+- `html` - headless browser screenshot via external Chromium or Chrome
 - `text` - plain white page with a width-aware text excerpt
 
 ## Install
@@ -46,11 +47,13 @@ Optional system dependencies:
 - `ffmpeg` for video previews
 - `pdftocairo` or `pdftoppm` for PDF rendering
 - `libreoffice` for `doc`, `docx`, `odt`, `rtf`, `ppt`, `pptx`, `xls`, `xlsx`, `csv`
+- `chromium`, `google-chrome`, or another detected Chrome-family browser for HTML rendering
 
 Example with Homebrew on macOS:
 
 ```bash
 brew install ffmpeg poppler libreoffice
+brew install --cask chromium
 ```
 
 ## Quick Start
@@ -194,6 +197,7 @@ const runtime = await quicklook.getRuntimeCapabilities();
 console.log(runtime.ffmpeg.available);
 console.log(runtime.pdftocairo.available);
 console.log(runtime.libreoffice.available);
+console.log(runtime.chromium.available);
 ```
 
 ## Supported Formats
@@ -207,7 +211,8 @@ This reflects the current implementation.
 | PDF | `pdf` | `pdf` | First page by default; requires Poppler |
 | Office docs | `doc`, `docx`, `odt`, `rtf`, `ppt`, `pptx`, `xls`, `xlsx`, `csv` | `office` | Requires `libreoffice` and Poppler |
 | EPUB | `epub` | `epub` | Uses cover image if available |
-| Text-like | `txt`, `md`, `markdown`, `json`, `xml`, `html`, `htm`, `js`, `jsx`, `ts`, `tsx`, `py`, `go`, `rs`, `yaml`, `yml`, `css`, `scss`, `sql`, `sh` | `text` | Renders a width-aware plain text excerpt |
+| HTML | `html`, `htm`, `xhtml` | `html` | Requires external Chromium or Chrome |
+| Text-like | `txt`, `md`, `markdown`, `json`, `xml`, `js`, `jsx`, `ts`, `tsx`, `py`, `go`, `rs`, `yaml`, `yml`, `css`, `scss`, `sql`, `sh` | `text` | Renders a width-aware plain text excerpt |
 
 Notes:
 
@@ -226,6 +231,15 @@ Text previews are intentionally plain.
 - No filename header
 - Width-aware excerpt only
 - Markdown headings and lists are preserved as text structure
+
+### HTML files
+
+HTML previews are rendered in a real headless browser and then resized through the normal image pipeline.
+
+- Uses an external Chromium or Chrome binary; no bundled browser download
+- Loads the local file with `file://` so path inputs can keep relative CSS, JS, and image references
+- `buffer` and `stream` inputs work best when the HTML is self-contained or points at remote assets
+- Captures the top of the page instead of reducing extremely tall pages into unreadable full-page miniatures
 
 ### EPUB
 
@@ -337,7 +351,8 @@ Default output directory:
 - No built-in object storage client
 - No fallback placeholder generation
 - No audio waveform or album-art strategy yet
-- No full browser-based HTML or Markdown page rendering
+- No bundled browser binaries
+- No full browser-based Markdown page rendering
 
 ## Development Notes
 

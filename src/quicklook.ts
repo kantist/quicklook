@@ -8,6 +8,7 @@ import { probeInput } from "./probe.js";
 import { getMissingDependenciesForSourceKind } from "./runtime/capabilities.js";
 import { detectRuntimeCapabilities } from "./runtime/detect.js";
 import { createEpubStrategy } from "./strategies/epub.js";
+import { createHtmlStrategy } from "./strategies/html.js";
 import { createImageStrategy } from "./strategies/image.js";
 import { createOfficeStrategy } from "./strategies/office.js";
 import { createPdfStrategy } from "./strategies/pdf.js";
@@ -138,6 +139,7 @@ function createDefaultStrategies() {
     createPdfStrategy(),
     createEpubStrategy(),
     createOfficeStrategy(),
+    createHtmlStrategy(),
     createTextStrategy(),
   ];
 }

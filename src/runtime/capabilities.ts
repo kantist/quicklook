@@ -4,6 +4,10 @@ export function hasPdfRenderingSupport(runtime: RuntimeCapabilities): boolean {
   return runtime.pdftocairo.available || runtime.pdftoppm.available;
 }
 
+export function hasHtmlRenderingSupport(runtime: RuntimeCapabilities): boolean {
+  return runtime.chromium.available;
+}
+
 export function hasOfficeRenderingSupport(runtime: RuntimeCapabilities): boolean {
   return runtime.libreoffice.available && hasPdfRenderingSupport(runtime);
 }
@@ -30,6 +34,8 @@ export function getMissingDependenciesForSourceKind(
 
       return missing;
     }
+    case "html":
+      return hasHtmlRenderingSupport(runtime) ? [] : ["chromium"];
     default:
       return [];
   }
