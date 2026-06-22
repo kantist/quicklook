@@ -61,10 +61,13 @@ test("extracts an EPUB cover image and renders it as a preview", async () => {
     },
   );
 
-  assert.equal(result.strategy, "epub");
-  assert.equal(result.sourceKind, "epub");
-  assert.equal(result.mimeType, "image/webp");
-  assert.equal(result.height, 256);
-  assert.ok(result.width > 0);
-  assert.ok(result.buffer.byteLength > 0);
+  const item = result.items[0];
+
+  assert.equal(result.items.length, 1);
+  assert.equal(item?.strategy, "epub");
+  assert.equal(item?.sourceKind, "epub");
+  assert.equal(item?.mimeType, "image/webp");
+  assert.equal(item?.height, 256);
+  assert.ok((item?.width ?? 0) > 0);
+  assert.ok((item?.buffer.byteLength ?? 0) > 0);
 });

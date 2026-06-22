@@ -25,7 +25,7 @@ interface CliOptions {
   height?: number;
   fit?: "contain" | "cover";
   noUpscale: boolean;
-  page?: number;
+  page?: QuicklookRequest["page"];
   probeOnly: boolean;
 }
 
@@ -47,20 +47,24 @@ async function main(): Promise<void> {
 
   const request = buildRequest(options);
   const result = await quicklook.generate(input, request);
+  const outputPaths = createOutputPaths(options.outputPath, result.items);
 
   await mkdir(resolveFromRoot("example/output"), { recursive: true });
-  await writeFile(options.outputPath, result.buffer);
+  await Promise.all(result.items.map((item, index) => writeFile(outputPaths[index] as string, item.buffer)));
 
   console.log("\nGenerated:");
   console.log(
     JSON.stringify(
       {
-        outputPath: options.outputPath,
-        width: result.width,
-        height: result.height,
-        mimeType: result.mimeType,
-        strategy: result.strategy,
-        sourceKind: result.sourceKind,
+        outputs: result.items.map((item, index) => ({
+          outputPath: outputPaths[index],
+          width: item.width,
+          height: item.height,
+          mimeType: item.mimeType,
+          strategy: item.strategy,
+          sourceKind: item.sourceKind,
+          meta: item.meta,
+        })),
         meta: result.meta,
       },
       null,
@@ -129,7 +133,7 @@ function parseArgs(args: string[]): CliOptions {
         break;
       }
       case "--page":
-        values.page = parsePositiveInteger(readRequiredValue(args[++index], "--page"), "--page");
+        values.page = parsePageSelection(readRequiredValue(args[++index], "--page"), "--page");
         break;
       case "--allow-upscale":
         values.noUpscale = false;
@@ -222,7 +226,7 @@ Options:
   --width <px>         Fixed output width
   --height <px>        Fixed output height
   --fit <mode>         contain | cover (used with width/height)
-  --page <number>      Page number for PDF/office inputs
+  --page <value>       Page number, comma list, or "all" for PDF/office inputs
   --allow-upscale      Allow enlarging smaller inputs
   --probe              Only run probe()
   --help               Show this message
@@ -231,6 +235,8 @@ Examples:
   npm run example
   npm run example -- --mode path --input example/fixtures/sample.md
   npm run example -- --input /tmp/report.pdf --page 1 --max-edge 768
+  npm run example -- --input /tmp/report.pdf --page 1,2,5 --out example/output/report.webp
+  npm run example -- --input /tmp/report.pdf --page all --out example/output/report.webp
   npm run example -- --input /tmp/poster.png --width 1200 --height 800 --fit cover
 `);
 }
@@ -253,6 +259,24 @@ function parsePositiveInteger(value: string, flag: string): number {
   return parsed;
 }
 
+function parsePageSelection(value: string, flag: string): QuicklookRequest["page"] {
+  if (value === "all") {
+    return "all";
+  }
+
+  if (value.includes(",")) {
+    const pages = value.split(",").map((entry) => parsePositiveInteger(entry.trim(), flag));
+
+    if (pages.length === 0) {
+      throw new QuicklookInputError(`${flag} must include at least one page.`);
+    }
+
+    return pages;
+  }
+
+  return parsePositiveInteger(value, flag);
+}
+
 function readRequiredValue(value: string | undefined, flag: string): string {
   if (!value) {
     throw new QuicklookInputError(`Missing value for ${flag}.`);
@@ -269,6 +293,17 @@ function resolvePathValue(value: string | undefined, flag: string): string {
 
 function resolveFromRoot(path: string): string {
   return resolve(process.cwd(), path);
+}
+
+function createOutputPaths(outputPath: string, items: Array<{ meta?: { page?: number } }>): string[] {
+  if (items.length <= 1) {
+    return [outputPath];
+  }
+
+  const extension = extname(outputPath);
+  const basePath = extension ? outputPath.slice(0, -extension.length) : outputPath;
+
+  return items.map((item, index) => `${basePath}-page-${item.meta?.page ?? index + 1}${extension}`);
 }
 
 function inferMimeTypeFromFilename(filename: string): string | undefined {

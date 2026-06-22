@@ -24,9 +24,12 @@ test("generates a text preview using maxEdge sizing", async () => {
     },
   );
 
-  assert.equal(result.strategy, "text");
-  assert.equal(result.mimeType, "image/webp");
-  assert.ok(result.width <= 256);
-  assert.ok(result.height <= 256);
-  assert.ok(result.buffer.byteLength > 0);
+  const item = result.items[0];
+
+  assert.equal(result.items.length, 1);
+  assert.equal(item?.strategy, "text");
+  assert.equal(item?.mimeType, "image/webp");
+  assert.ok((item?.width ?? 0) <= 256);
+  assert.ok((item?.height ?? 0) <= 256);
+  assert.ok((item?.buffer.byteLength ?? 0) > 0);
 });

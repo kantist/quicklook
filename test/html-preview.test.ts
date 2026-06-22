@@ -87,13 +87,16 @@ test("renders html previews through chromium when available", async (context) =>
     },
   );
 
-  assert.equal(result.strategy, "html");
-  assert.equal(result.sourceKind, "html");
-  assert.equal(result.mimeType, "image/webp");
-  assert.ok(result.width <= 256);
-  assert.ok(result.height <= 256);
-  assert.ok(result.height >= result.width);
+  const item = result.items[0];
 
-  const stats = await sharp(result.buffer).stats();
+  assert.equal(result.items.length, 1);
+  assert.equal(item?.strategy, "html");
+  assert.equal(item?.sourceKind, "html");
+  assert.equal(item?.mimeType, "image/webp");
+  assert.ok((item?.width ?? 0) <= 256);
+  assert.ok((item?.height ?? 0) <= 256);
+  assert.ok((item?.height ?? 0) >= (item?.width ?? 0));
+
+  const stats = await sharp(item!.buffer).stats();
   assert.ok(stats.channels[0].mean > stats.channels[2].mean);
 });

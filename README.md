@@ -78,9 +78,11 @@ const result = await quicklook.generate(
   },
 );
 
-console.log(result.mimeType); // image/webp
-console.log(result.width, result.height);
-console.log(result.strategy); // pdf
+const first = result.items[0];
+
+console.log(first?.mimeType); // image/webp
+console.log(first?.width, first?.height);
+console.log(first?.strategy); // pdf
 ```
 
 ## Why this package exists
@@ -130,6 +132,8 @@ Defaults:
 - `size: { maxEdge: 512 }`
 - `noUpscale: true`
 - `page: 1`
+
+For PDF and office inputs, `page` can also be an array like `[1, 2, 5]` or `"all"` to render multiple previews from one request.
 
 ## Usage Examples
 
@@ -279,12 +283,23 @@ type QuicklookRequest = {
     | { maxEdge: number }
     | { width: number; height: number; fit?: "contain" | "cover" };
   format?: "webp" | "png";
-  page?: number;
+  page?: number | readonly number[] | "all";
   noUpscale?: boolean;
 };
 ```
 
-Result shape:
+`generate()` always returns:
+
+```ts
+type QuicklookBatchResult = {
+  items: QuicklookResult[];
+  meta?: {
+    pageCount?: number;
+  };
+};
+```
+
+Item shape:
 
 ```ts
 type QuicklookResult = {

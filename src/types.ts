@@ -33,10 +33,12 @@ export type QuicklookInput = QuicklookPathInput | QuicklookBufferInput | Quicklo
 
 export type QuicklookSizeRequest = { maxEdge: number } | { width: number; height: number; fit?: QuicklookFit };
 
+export type QuicklookPageSelection = number | readonly number[] | "all";
+
 export interface QuicklookRequest {
   size?: QuicklookSizeRequest;
   format?: QuicklookOutputFormat;
-  page?: number;
+  page?: QuicklookPageSelection;
   noUpscale?: boolean;
 }
 
@@ -53,6 +55,11 @@ export interface QuicklookResult {
   height: number;
   strategy: string;
   sourceKind: QuicklookSourceKind;
+  meta?: QuicklookMetadata;
+}
+
+export interface QuicklookBatchResult {
+  items: QuicklookResult[];
   meta?: QuicklookMetadata;
 }
 
@@ -150,11 +157,17 @@ export interface StrategyRenderResult {
   meta?: QuicklookMetadata;
 }
 
+export interface StrategyRenderBatchResult {
+  items: StrategyRenderResult[];
+  meta?: QuicklookMetadata;
+}
+
 export interface QuicklookStrategy {
   id: string;
   priority: number;
   match(input: ProbeInput | ResolvedInput, runtime: RuntimeCapabilities): Promise<number | null> | number | null;
   render(context: StrategyRenderContext): Promise<StrategyRenderResult>;
+  renderBatch?(context: StrategyRenderContext, pageSelection: readonly number[] | "all"): Promise<StrategyRenderBatchResult>;
 }
 
 export interface QuicklookOptions {
@@ -170,7 +183,7 @@ export interface NormalizedQuicklookOptions {
 }
 
 export interface QuicklookInstance {
-  generate(input: QuicklookInput, request?: QuicklookRequest): Promise<QuicklookResult>;
+  generate(input: QuicklookInput, request?: QuicklookRequest): Promise<QuicklookBatchResult>;
   probe(input: QuicklookInput): Promise<ProbeResult>;
   getRuntimeCapabilities(): Promise<RuntimeCapabilities>;
 }

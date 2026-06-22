@@ -15,6 +15,7 @@ export type {
   ProbeInput,
   ProbeResult,
   QuicklookBinaryOptions,
+  QuicklookBatchResult,
   QuicklookFit,
   QuicklookInput,
   QuicklookInstance,
@@ -22,6 +23,7 @@ export type {
   QuicklookMetadata,
   QuicklookOptions,
   QuicklookOutputFormat,
+  QuicklookPageSelection,
   QuicklookRequest,
   QuicklookResult,
   QuicklookSizeRequest,
@@ -31,5 +33,6 @@ export type {
   RuntimeBinaryCapability,
   RuntimeCapabilities,
   StrategyRenderContext,
+  StrategyRenderBatchResult,
   StrategyRenderResult,
 } from "./types.js";

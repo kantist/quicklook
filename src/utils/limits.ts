@@ -4,6 +4,7 @@ import type {
   NormalizedQuicklookLimits,
   NormalizedQuicklookRequest,
   QuicklookLimits,
+  QuicklookPageSelection,
   QuicklookRequest,
 } from "../types.js";
 
@@ -21,9 +22,9 @@ export function normalizeLimits(limits?: QuicklookLimits): NormalizedQuicklookLi
   };
 }
 
-export function normalizeRequest(request: QuicklookRequest = {}): NormalizedQuicklookRequest {
+export function normalizeRequest(request: QuicklookRequest = {}, pageValue = 1): NormalizedQuicklookRequest {
   const format = request.format ?? "webp";
-  const page = normalizePositiveInteger(request.page ?? 1, "request.page");
+  const page = normalizePositiveInteger(pageValue, "request.page");
   const noUpscale = request.noUpscale ?? true;
 
   if (request.size && "maxEdge" in request.size) {
@@ -61,6 +62,26 @@ export function normalizeRequest(request: QuicklookRequest = {}): NormalizedQuic
       maxEdge: DEFAULT_MAX_EDGE,
     },
   };
+}
+
+export function normalizePageSelection(page: QuicklookRequest["page"]): QuicklookPageSelection {
+  if (page === undefined) {
+    return 1;
+  }
+
+  if (page === "all") {
+    return page;
+  }
+
+  if (typeof page === "number") {
+    return normalizePositiveInteger(page, "request.page");
+  }
+
+  if (!Array.isArray(page) || page.length === 0) {
+    throw new QuicklookInputError('request.page must be a positive integer, a non-empty array of positive integers, or "all".');
+  }
+
+  return page.map((value, index) => normalizePositiveInteger(value, `request.page[${index}]`));
 }
 
 export function assertWithinLimit(value: number, max: number, message: string): void {
