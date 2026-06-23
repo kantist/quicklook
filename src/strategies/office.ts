@@ -26,6 +26,7 @@ export function createOfficeStrategy(): QuicklookStrategy {
       const outputPath = await renderPdfToPng({
         inputPath: convertedPdf,
         page: context.request.page,
+        size: context.request.size,
         runtime: context.runtime,
         workDir: context.workDir,
         timeoutMs: context.limits.timeoutMs,
@@ -42,6 +43,7 @@ export function createOfficeStrategy(): QuicklookStrategy {
       const renderedPages = await renderPdfPageSelectionToPng({
         inputPath: convertedPdf,
         pageSelection,
+        size: context.request.size,
         runtime: context.runtime,
         workDir: context.workDir,
         timeoutMs: context.limits.timeoutMs,

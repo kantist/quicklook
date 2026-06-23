@@ -6,7 +6,9 @@ import { QuicklookDependencyError, QuicklookRenderError } from "../errors.js";
 import { hasPdfRenderingSupport } from "../runtime/capabilities.js";
 import { runCommand } from "../utils/exec.js";
 
-import type { QuicklookStrategy, RuntimeCapabilities } from "../types.js";
+import type { NormalizedQuicklookSizeRequest, QuicklookStrategy, RuntimeCapabilities } from "../types.js";
+
+const COVER_RASTER_OVERSCAN_MULTIPLIER = 2;
 
 export function createPdfStrategy(): QuicklookStrategy {
   return {
@@ -23,6 +25,7 @@ export function createPdfStrategy(): QuicklookStrategy {
       const outputPath = await renderPdfToPng({
         inputPath: context.input.path,
         page: context.request.page,
+        size: context.request.size,
         runtime: context.runtime,
         workDir: context.workDir,
         timeoutMs: context.limits.timeoutMs,
@@ -38,6 +41,7 @@ export function createPdfStrategy(): QuicklookStrategy {
       const renderedPages = await renderPdfPageSelectionToPng({
         inputPath: context.input.path,
         pageSelection,
+        size: context.request.size,
         runtime: context.runtime,
         workDir: context.workDir,
         timeoutMs: context.limits.timeoutMs,
@@ -58,6 +62,7 @@ export function createPdfStrategy(): QuicklookStrategy {
 export async function renderPdfPageSelectionToPng(args: {
   inputPath: string;
   pageSelection: readonly number[] | "all";
+  size: NormalizedQuicklookSizeRequest;
   runtime: RuntimeCapabilities;
   workDir: string;
   timeoutMs: number;
@@ -74,6 +79,7 @@ export async function renderPdfPageSelectionToPng(args: {
       path: await renderPdfToPng({
         inputPath: args.inputPath,
         page,
+        size: args.size,
         runtime: args.runtime,
         workDir: args.workDir,
         timeoutMs: args.timeoutMs,
@@ -88,6 +94,7 @@ export async function renderPdfPageSelectionToPng(args: {
 export async function renderPdfToPng(args: {
   inputPath: string;
   page: number;
+  size: NormalizedQuicklookSizeRequest;
   runtime: RuntimeCapabilities;
   workDir: string;
   timeoutMs: number;
@@ -98,10 +105,11 @@ export async function renderPdfToPng(args: {
   if (args.runtime.pdftocairo.path) {
     const outputPrefix = join(args.workDir, outputStem);
     const outputPath = `${outputPrefix}.png`;
+    const scaleArgs = buildPdfRasterScaleArgs(args.size);
 
     await runCommand(
       args.runtime.pdftocairo.path,
-      ["-png", "-singlefile", "-f", String(args.page), "-l", String(args.page), args.inputPath, outputPrefix],
+      ["-png", "-singlefile", ...scaleArgs, "-f", String(args.page), "-l", String(args.page), args.inputPath, outputPrefix],
       { timeoutMs: args.timeoutMs },
     );
 
@@ -112,10 +120,11 @@ export async function renderPdfToPng(args: {
   if (args.runtime.pdftoppm.path) {
     const outputPrefix = join(args.workDir, outputStem);
     const outputPath = `${outputPrefix}-${args.page}.png`;
+    const scaleArgs = buildPdfRasterScaleArgs(args.size);
 
     await runCommand(
       args.runtime.pdftoppm.path,
-      ["-png", "-f", String(args.page), "-l", String(args.page), args.inputPath, outputPrefix],
+      ["-png", ...scaleArgs, "-f", String(args.page), "-l", String(args.page), args.inputPath, outputPrefix],
       { timeoutMs: args.timeoutMs },
     );
 
@@ -132,6 +141,7 @@ export async function renderPdfToPng(args: {
 
 async function renderAllPdfPagesToPng(args: {
   inputPath: string;
+  size: NormalizedQuicklookSizeRequest;
   runtime: RuntimeCapabilities;
   workDir: string;
   timeoutMs: number;
@@ -140,9 +150,11 @@ async function renderAllPdfPagesToPng(args: {
   const outputName = basename(outputPrefix);
 
   if (args.runtime.pdftocairo.path) {
+    const scaleArgs = buildPdfRasterScaleArgs(args.size);
+
     await runCommand(
       args.runtime.pdftocairo.path,
-      ["-png", args.inputPath, outputPrefix],
+      ["-png", ...scaleArgs, args.inputPath, outputPrefix],
       { timeoutMs: args.timeoutMs },
     );
 
@@ -154,9 +166,11 @@ async function renderAllPdfPagesToPng(args: {
   }
 
   if (args.runtime.pdftoppm.path) {
+    const scaleArgs = buildPdfRasterScaleArgs(args.size);
+
     await runCommand(
       args.runtime.pdftoppm.path,
-      ["-png", args.inputPath, outputPrefix],
+      ["-png", ...scaleArgs, args.inputPath, outputPrefix],
       { timeoutMs: args.timeoutMs },
     );
 
@@ -205,4 +219,17 @@ async function ensureExists(path: string): Promise<void> {
   } catch (error) {
     throw new QuicklookRenderError(`Expected render output was not created: ${path}`, { cause: error as Error });
   }
+}
+
+export function buildPdfRasterScaleArgs(size: NormalizedQuicklookSizeRequest): string[] {
+  if (size.mode === "max-edge") {
+    return ["-scale-to", String(size.maxEdge)];
+  }
+
+  const requestedLongSide = Math.max(size.width, size.height);
+  const targetLongSide = size.fit === "cover"
+    ? requestedLongSide * COVER_RASTER_OVERSCAN_MULTIPLIER
+    : requestedLongSide;
+
+  return ["-scale-to", String(targetLongSide)];
 }
