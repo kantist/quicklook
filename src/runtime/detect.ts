@@ -130,7 +130,13 @@ async function readBinaryVersion(path: string, args: readonly string[]): Promise
     windowsHide: true,
   });
 
-  if (result.failed || result.exitCode !== 0 || result.timedOut) {
+  // A binary that started but answered slowly is there: Chrome on a busy machine can take seconds to print its
+  // version, and treating that as missing makes every HTML preview fail.
+  if (result.timedOut) {
+    return undefined;
+  }
+
+  if (result.failed || result.exitCode !== 0) {
     return null;
   }
 
