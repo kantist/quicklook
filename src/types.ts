@@ -40,6 +40,11 @@ export interface QuicklookRequest {
   format?: QuicklookOutputFormat;
   page?: QuicklookPageSelection;
   noUpscale?: boolean;
+  /**
+   * Lets an HTML input run its scripts. Only for HTML the caller built itself and guards with its own
+   * Content-Security-Policy; an uploaded page never runs any. Files and the network stay closed either way.
+   */
+  trustedHtmlScripts?: boolean;
 }
 
 export interface QuicklookMetadata {
@@ -119,6 +124,7 @@ export interface NormalizedQuicklookRequest {
   format: QuicklookOutputFormat;
   page: number;
   noUpscale: boolean;
+  trustedHtmlScripts: boolean;
 }
 
 export interface ResolvedInput {

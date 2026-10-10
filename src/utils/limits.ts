@@ -26,12 +26,14 @@ export function normalizeRequest(request: QuicklookRequest = {}, pageValue = 1):
   const format = request.format ?? "webp";
   const page = normalizePositiveInteger(pageValue, "request.page");
   const noUpscale = request.noUpscale ?? true;
+  const trustedHtmlScripts = request.trustedHtmlScripts === true;
 
   if (request.size && "maxEdge" in request.size) {
     return {
       format,
       page,
       noUpscale,
+      trustedHtmlScripts,
       size: {
         mode: "max-edge",
         maxEdge: normalizePositiveInteger(request.size.maxEdge, "request.size.maxEdge"),
@@ -44,6 +46,7 @@ export function normalizeRequest(request: QuicklookRequest = {}, pageValue = 1):
       format,
       page,
       noUpscale,
+      trustedHtmlScripts,
       size: {
         mode: "box",
         width: normalizePositiveInteger(request.size.width, "request.size.width"),
@@ -57,6 +60,7 @@ export function normalizeRequest(request: QuicklookRequest = {}, pageValue = 1):
     format,
     page,
     noUpscale,
+    trustedHtmlScripts,
     size: {
       mode: "max-edge",
       maxEdge: DEFAULT_MAX_EDGE,
