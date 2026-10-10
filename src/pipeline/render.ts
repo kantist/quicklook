@@ -9,7 +9,7 @@ import type {
   StrategyRenderResult,
 } from "../types.js";
 
-const TRIMMED_OFFICE_EXTENSIONS = new Set(["csv", "xls", "xlsx"]);
+const TRIMMED_OFFICE_EXTENSIONS = new Set(["csv", "xls", "xlsx", "ods"]);
 
 export async function renderWithStrategy(
   strategy: QuicklookStrategy,

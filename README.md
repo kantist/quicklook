@@ -46,7 +46,8 @@ Optional system dependencies:
 
 - `ffmpeg` for video previews
 - `pdftocairo` or `pdftoppm` for PDF rendering
-- `libreoffice` for `doc`, `docx`, `odt`, `rtf`, `ppt`, `pptx`, `xls`, `xlsx`, `csv`
+- `libreoffice` for `doc`, `docx`, `odt`, `rtf`, `ppt`, `pptx`, `odp`, `xls`, `xlsx`, `ods`, `csv`
+- `heif-dec` (or `heif-convert`, from libheif) for HEIC and HEIF photos
 - `chromium`, `google-chrome`, or another detected Chrome-family browser for HTML rendering
 
 Example with Homebrew on macOS:
@@ -133,7 +134,7 @@ Defaults:
 - `noUpscale: true`
 - `page: 1`
 
-For PDF and office inputs, `page` can also be an array like `[1, 2, 5]` or `"all"` to render multiple previews from one request.
+For PDF, office and multi-page TIFF inputs, `page` can also be an array like `[1, 2, 5]` or `"all"` to render multiple previews from one request.
 
 ## Usage Examples
 
@@ -210,10 +211,10 @@ This reflects the current implementation.
 
 | Group | Formats | Strategy | Notes |
 |---|---|---|---|
-| Images | `avif`, `gif`, `jpeg`, `jpg`, `png`, `svg`, `tif`, `tiff`, `webp` | `image` | Direct image processing via `sharp` |
-| Video | `mov`, `mp4`, `webm` | `video` | Requires `ffmpeg` |
+| Images | `avif`, `gif`, `jpeg`, `jpg`, `png`, `svg`, `tif`, `tiff`, `webp`, `heic`, `heif`, `bmp` | `image` | Direct image processing via `sharp`; HEIC/HEIF decoded with libheif (`heif-dec`), BMP with `ffmpeg`; a multi-page TIFF renders page by page |
+| Video | `mov`, `mp4`, `webm`, `mkv`, `avi`, `m4v`, `3gp` | `video` | Requires `ffmpeg` |
 | PDF | `pdf` | `pdf` | First page by default; requires Poppler |
-| Office docs | `doc`, `docx`, `odt`, `rtf`, `ppt`, `pptx`, `xls`, `xlsx`, `csv` | `office` | Requires `libreoffice` and Poppler |
+| Office docs | `doc`, `docx`, `odt`, `rtf`, `ppt`, `pptx`, `odp`, `xls`, `xlsx`, `ods`, `csv` | `office` | Requires `libreoffice` and Poppler |
 | EPUB | `epub` | `epub` | Uses cover image if available |
 | HTML | `html`, `htm`, `xhtml` | `html` | Requires external Chromium or Chrome |
 | Text-like | `txt`, `md`, `markdown`, `json`, `xml`, `js`, `jsx`, `ts`, `tsx`, `py`, `go`, `rs`, `yaml`, `yml`, `css`, `scss`, `sql`, `sh` | `text` | Renders a width-aware plain text excerpt |

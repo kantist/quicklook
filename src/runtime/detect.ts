@@ -23,6 +23,7 @@ const BINARY_CANDIDATES = {
     "chromium",
     "chromium-browser",
   ],
+  heif: ["heif-dec", "heif-convert"],
 } as const;
 
 const VERSION_ARGS = {
@@ -31,15 +32,18 @@ const VERSION_ARGS = {
   pdftoppm: ["-v"],
   libreoffice: ["--version"],
   chromium: ["--version"],
+  // heif-convert before libheif 1.17 has no version flag; being on the PATH is enough.
+  heif: null,
 } as const;
 
 export async function detectRuntimeCapabilities(binaries: QuicklookBinaryOptions = {}): Promise<RuntimeCapabilities> {
-  const [ffmpeg, pdftocairo, pdftoppm, libreoffice, chromium] = await Promise.all([
+  const [ffmpeg, pdftocairo, pdftoppm, libreoffice, chromium, heif] = await Promise.all([
     detectBinary("ffmpeg", binaries.ffmpeg, BINARY_CANDIDATES.ffmpeg, VERSION_ARGS.ffmpeg),
     detectBinary("pdftocairo", binaries.pdftocairo, BINARY_CANDIDATES.pdftocairo, VERSION_ARGS.pdftocairo),
     detectBinary("pdftoppm", binaries.pdftoppm, BINARY_CANDIDATES.pdftoppm, VERSION_ARGS.pdftoppm),
     detectBinary("libreoffice", binaries.libreoffice, BINARY_CANDIDATES.libreoffice, VERSION_ARGS.libreoffice),
     detectBinary("chromium", binaries.chromium, BINARY_CANDIDATES.chromium, VERSION_ARGS.chromium),
+    detectBinary("heif", binaries.heif, BINARY_CANDIDATES.heif, VERSION_ARGS.heif),
   ]);
 
   return {
@@ -48,6 +52,7 @@ export async function detectRuntimeCapabilities(binaries: QuicklookBinaryOptions
     pdftoppm,
     libreoffice,
     chromium,
+    heif,
   };
 }
 
@@ -55,7 +60,7 @@ async function detectBinary(
   name: string,
   configuredValue: string | false | undefined,
   candidates: readonly string[],
-  versionArgs: readonly string[],
+  versionArgs: readonly string[] | null,
 ): Promise<RuntimeBinaryCapability> {
   if (configuredValue === false) {
     return {
@@ -78,7 +83,7 @@ async function detectBinary(
     };
   }
 
-  const version = await readBinaryVersion(path, versionArgs);
+  const version = versionArgs ? await readBinaryVersion(path, versionArgs) : undefined;
 
   if (version === null) {
     return {

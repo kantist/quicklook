@@ -87,6 +87,8 @@ export interface RuntimeCapabilities {
   pdftoppm: RuntimeBinaryCapability;
   libreoffice: RuntimeBinaryCapability;
   chromium: RuntimeBinaryCapability;
+  /** libheif's decoder (`heif-dec`, or `heif-convert` before libheif 1.17), for HEIC and HEIF photos. */
+  heif: RuntimeBinaryCapability;
 }
 
 export interface QuicklookBinaryOptions {
@@ -95,6 +97,7 @@ export interface QuicklookBinaryOptions {
   pdftoppm?: string | false;
   libreoffice?: string | false;
   chromium?: string | false;
+  heif?: string | false;
 }
 
 export interface QuicklookLimits {

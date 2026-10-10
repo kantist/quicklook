@@ -2,9 +2,9 @@ import { extension as extensionFromMimeTypeLookup, lookup as mimeLookup } from "
 
 import type { QuicklookSourceKind } from "../types.js";
 
-const IMAGE_EXTENSIONS = new Set(["jpg", "jpeg", "png", "webp", "gif", "tif", "tiff", "avif", "svg"]);
-const VIDEO_EXTENSIONS = new Set(["mp4", "mov", "webm", "mkv", "avi", "m4v"]);
-const OFFICE_EXTENSIONS = new Set(["doc", "docx", "odt", "rtf", "ppt", "pptx", "xls", "xlsx", "csv"]);
+const IMAGE_EXTENSIONS = new Set(["jpg", "jpeg", "png", "webp", "gif", "tif", "tiff", "avif", "svg", "heic", "heif", "bmp"]);
+const VIDEO_EXTENSIONS = new Set(["mp4", "mov", "webm", "mkv", "avi", "m4v", "3gp"]);
+const OFFICE_EXTENSIONS = new Set(["doc", "docx", "odt", "rtf", "ppt", "pptx", "odp", "xls", "xlsx", "ods", "csv"]);
 const TEXT_EXTENSIONS = new Set([
   "txt",
   "md",
@@ -30,6 +30,8 @@ const OFFICE_MIME_TYPES = new Set([
   "application/msword",
   "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
   "application/vnd.oasis.opendocument.text",
+  "application/vnd.oasis.opendocument.presentation",
+  "application/vnd.oasis.opendocument.spreadsheet",
   "application/rtf",
   "application/vnd.ms-powerpoint",
   "application/vnd.openxmlformats-officedocument.presentationml.presentation",

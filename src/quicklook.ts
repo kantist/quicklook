@@ -9,7 +9,7 @@ import { getMissingDependenciesForSourceKind } from "./runtime/capabilities.js";
 import { detectRuntimeCapabilities } from "./runtime/detect.js";
 import { createEpubStrategy } from "./strategies/epub.js";
 import { createHtmlStrategy } from "./strategies/html.js";
-import { createImageStrategy } from "./strategies/image.js";
+import { createImageStrategy, isPagedImage } from "./strategies/image.js";
 import { createOfficeStrategy } from "./strategies/office.js";
 import { createPdfStrategy } from "./strategies/pdf.js";
 import { createTextStrategy } from "./strategies/text.js";
@@ -54,8 +54,8 @@ export function createQuicklook(options: QuicklookOptions = {}): QuicklookInstan
         throw createUnsupportedError(resolvedInput, runtime);
       }
 
-      if (typeof normalizedPageSelection !== "number" && !supportsMultiPageSelection(resolvedInput.sourceKind)) {
-        throw new QuicklookInputError("Multi-page requests are only supported for PDF and office inputs.");
+      if (typeof normalizedPageSelection !== "number" && !supportsMultiPageSelection(resolvedInput)) {
+        throw new QuicklookInputError("Multi-page requests are only supported for PDF, office and TIFF inputs.");
       }
 
       const pageSelection = typeof normalizedPageSelection === "number" ? [normalizedPageSelection] : normalizedPageSelection;
@@ -103,8 +103,8 @@ export function createQuicklook(options: QuicklookOptions = {}): QuicklookInstan
   };
 }
 
-function supportsMultiPageSelection(sourceKind: ResolvedInput["sourceKind"]): boolean {
-  return sourceKind === "pdf" || sourceKind === "office";
+function supportsMultiPageSelection(input: ResolvedInput): boolean {
+  return input.sourceKind === "pdf" || input.sourceKind === "office" || (input.sourceKind === "image" && isPagedImage(input.extension));
 }
 
 async function prepareResolvedInput(
