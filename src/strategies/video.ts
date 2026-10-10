@@ -5,6 +5,20 @@ import { runCommand } from "../utils/exec.js";
 
 import type { QuicklookStrategy } from "../types.js";
 
+/**
+ * The demuxer each video is read with, chosen by its extension rather than guessed from its bytes: a playlist (HLS,
+ * concat) uploaded as "video.mp4" would otherwise be followed, and the files it names drawn into the preview.
+ */
+const DEMUXERS: Record<string, string> = {
+  mp4: "mov",
+  mov: "mov",
+  m4v: "mov",
+  "3gp": "mov",
+  webm: "matroska",
+  mkv: "matroska",
+  avi: "avi",
+};
+
 export function createVideoStrategy(): QuicklookStrategy {
   return {
     id: "video",
@@ -27,7 +41,22 @@ export function createVideoStrategy(): QuicklookStrategy {
 
       await runCommand(
         binaryPath,
-        ["-hide_banner", "-loglevel", "error", "-y", "-i", context.input.path, "-vf", "thumbnail=24", "-frames:v", "1", outputPath],
+        [
+          "-hide_banner",
+          "-loglevel",
+          "error",
+          "-y",
+          "-protocol_whitelist",
+          "file",
+          ...(DEMUXERS[context.input.extension ?? ""] ? ["-f", DEMUXERS[context.input.extension ?? ""]!] : []),
+          "-i",
+          context.input.path,
+          "-vf",
+          "thumbnail=24",
+          "-frames:v",
+          "1",
+          outputPath,
+        ],
         { timeoutMs: context.limits.timeoutMs },
       );
 

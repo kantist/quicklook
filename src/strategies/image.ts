@@ -100,7 +100,7 @@ async function decodedPath(context: StrategyRenderContext): Promise<string> {
     }
 
     const outputPath = join(context.workDir, "bitmap-decoded.png");
-    await runCommand(binaryPath, ["-hide_banner", "-loglevel", "error", "-y", "-i", context.input.path, outputPath], {
+    await runCommand(binaryPath, ["-hide_banner", "-loglevel", "error", "-y", "-protocol_whitelist", "file", "-f", "bmp_pipe", "-i", context.input.path, outputPath], {
       timeoutMs: context.limits.timeoutMs,
     });
     return outputPath;

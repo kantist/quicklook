@@ -4,6 +4,8 @@ import { access } from "node:fs/promises";
 import { execa } from "execa";
 import which from "which";
 
+import { converterEnvironment } from "../utils/exec.js";
+
 import type { QuicklookBinaryOptions, RuntimeBinaryCapability, RuntimeCapabilities } from "../types.js";
 
 const BINARY_CANDIDATES = {
@@ -125,6 +127,8 @@ async function resolveAbsoluteBinary(path: string): Promise<string | undefined> 
 
 async function readBinaryVersion(path: string, args: readonly string[]): Promise<string | undefined | null> {
   const result = await execa(path, [...args], {
+    env: converterEnvironment(),
+    extendEnv: false,
     reject: false,
     timeout: 5_000,
     windowsHide: true,
