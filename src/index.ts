@@ -5,6 +5,7 @@ export {
   QuicklookError,
   QuicklookInputError,
   QuicklookRenderError,
+  QuicklookTimeoutError,
   QuicklookUnsupportedError,
 } from "./errors.js";
 

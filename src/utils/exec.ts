@@ -27,7 +27,7 @@ export function converterEnvironment(): Record<string, string> {
   };
 }
 
-import { QuicklookRenderError } from "../errors.js";
+import { QuicklookRenderError, QuicklookTimeoutError } from "../errors.js";
 
 export async function runCommand(
   file: string,
@@ -42,6 +42,12 @@ export async function runCommand(
     timeout: options.timeoutMs,
     windowsHide: true,
   });
+
+  if (result.timedOut) {
+    throw new QuicklookTimeoutError(`Command timed out after ${String(options.timeoutMs)} ms: ${file}`, {
+      cause: new Error(result.stderr || result.stdout || "No output."),
+    });
+  }
 
   if (result.failed || result.exitCode !== 0) {
     throw new QuicklookRenderError(`Command failed: ${file}`, {

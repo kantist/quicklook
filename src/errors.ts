@@ -31,3 +31,6 @@ export class QuicklookRenderError extends QuicklookError {
     super("RENDER_ERROR", message, options);
   }
 }
+
+/** A converter ran past its time limit (`limits.timeoutMs`) and was stopped: what it printed says nothing of the file. */
+export class QuicklookTimeoutError extends QuicklookRenderError {}
