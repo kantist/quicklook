@@ -133,8 +133,7 @@ export function zipPosterSvg(summary: ZipSummary): string {
   <g transform="translate(300 170)">
     <path d="M40 0h170c14 0 26 6 34 17l26 35c8 11 20 17 34 17h296c22 0 40 18 40 40v391c0 22-18 40-40 40H40c-22 0-40-18-40-40V40C0 18 18 0 40 0Z" fill="#5aa0ec"/>
     <path d="M0 150c0-22 18-40 40-40h520c22 0 40 18 40 40v350c0 22-18 40-40 40H40c-22 0-40-18-40-40Z" fill="#7db7f3"/>
-    <text x="300" y="${330 + countSize * 0.18}" text-anchor="middle" font-family="Inter, -apple-system, 'Helvetica Neue', Arial, sans-serif" font-size="${countSize}" font-weight="600" fill="#ffffff">${count}</text>
-    <text x="300" y="440" text-anchor="middle" font-family="Inter, -apple-system, 'Helvetica Neue', Arial, sans-serif" font-size="44" font-weight="500" fill="#ffffff" fill-opacity="0.92">${summary.fileCount === 1 ? "file" : "files"}</text>
+    <text x="300" y="${325 + countSize * 0.35}" text-anchor="middle" font-family="Inter, -apple-system, 'Helvetica Neue', Arial, sans-serif" font-size="${countSize}" font-weight="600" fill="#ffffff">${count}</text>
   </g>
   <text x="600" y="790" text-anchor="middle" font-family="Inter, -apple-system, 'Helvetica Neue', Arial, sans-serif" font-size="40" fill="#6f6f6f">${filesLabel(summary.fileCount)}, ${sizeLabel(summary.totalBytes)}</text>
 </svg>`;
