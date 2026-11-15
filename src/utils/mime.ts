@@ -3,6 +3,12 @@ import { extension as extensionFromMimeTypeLookup, lookup as mimeLookup } from "
 import type { QuicklookSourceKind } from "../types.js";
 
 const IMAGE_EXTENSIONS = new Set(["jpg", "jpeg", "png", "webp", "gif", "tif", "tiff", "avif", "svg", "heic", "heif", "bmp"]);
+/**
+ * Drawings registered under image/ that are vector CAD, not pictures: no image decoder reads them, so they are not
+ * images here (a host's viewer strategy draws them).
+ */
+const CAD_IMAGE_MIME_TYPES = new Set(["image/vnd.dxf", "image/x-dxf", "image/vnd.dwg", "image/x-dwg"]);
+const CAD_EXTENSIONS = new Set(["dxf", "dwg"]);
 const VIDEO_EXTENSIONS = new Set(["mp4", "mov", "webm", "mkv", "avi", "m4v", "3gp"]);
 const OFFICE_EXTENSIONS = new Set(["doc", "docx", "odt", "rtf", "ppt", "pptx", "odp", "xls", "xlsx", "ods", "csv"]);
 const TEXT_EXTENSIONS = new Set([
@@ -141,6 +147,10 @@ export function detectSourceKind(args: { extension?: string; mimeType?: string }
 
   if (OFFICE_EXTENSIONS.has(extension ?? "") || OFFICE_MIME_TYPES.has(mimeType ?? "")) {
     return "office";
+  }
+
+  if (CAD_IMAGE_MIME_TYPES.has(mimeType ?? "") || CAD_EXTENSIONS.has(extension ?? "")) {
+    return "unknown";
   }
 
   if (mimeType?.startsWith("image/") || IMAGE_EXTENSIONS.has(extension ?? "")) {
