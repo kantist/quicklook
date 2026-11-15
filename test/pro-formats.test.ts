@@ -140,3 +140,31 @@ test("draws a Gerber layer through the viewer's thumbnail page, the file handed 
     server.close();
   }
 });
+
+test("hands a DXF or DWG to the viewer, not to the image decoder its image/vnd MIME type suggests", async (t) => {
+  // The API sends a drawing with the MIME type it was uploaded with: image/vnd.dxf. The image strategy (priority 100)
+  // took it and gave sharp a text file ("unsupported image format"), so no drawing ever had a thumbnail.
+  assert.equal(detectSourceKind({ extension: "dxf", mimeType: "image/vnd.dxf" }), "unknown");
+  assert.equal(detectSourceKind({ extension: "dwg", mimeType: "image/vnd.dwg" }), "unknown");
+  assert.equal(detectSourceKind({ extension: "png", mimeType: "image/png" }), "image");
+  const quicklook = createQuicklook({ binaries: NO_BINARIES });
+  if (!(await quicklook.getRuntimeCapabilities()).chromium.available) return t.skip("no Chromium");
+  const red = await sharp({ create: { width: 300, height: 200, channels: 3, background: "#c0392b" } }).png().toBuffer();
+  const page = `<!doctype html><script>window.__dvinaThumbnail = { state: "picture", dataUrl: ${JSON.stringify(`data:image/png;base64,${red.toString("base64")}`)} };</script>`;
+  const server = createServer((_, response) => response.writeHead(200, { "content-type": "text/html" }).end(page));
+  await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
+  const { port } = server.address() as { port: number };
+  try {
+    const withViewer = createQuicklook({
+      binaries: NO_BINARIES,
+      strategies: [createViewerStrategy({ viewerUrl: `http://127.0.0.1:${port}/`, formats: { dxf: { format: "dxf", render: "2d" } } })],
+    });
+    const result = await withViewer.generate(
+      { buffer: Buffer.from("0\nSECTION\n2\nENTITIES\n0\nENDSEC\n0\nEOF\n"), filename: "plan.dxf", mimeType: "image/vnd.dxf" },
+      { size: { maxEdge: 300 } },
+    );
+    assert.equal(result.items[0]?.strategy, "viewer");
+  } finally {
+    server.close();
+  }
+});
